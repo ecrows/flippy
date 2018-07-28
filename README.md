@@ -1,6 +1,8 @@
 # overlay-lapse
 Python script for generating videos by overlaying images.
 
+![Preview Example](examples/anime_face.gif)
+
 usage: lapse.py [-h] [-v] [-f FPS] [-o OUTPUT] [-c CODEC] path [path ...]
 
 Build a fading timelapse of overlayed images.

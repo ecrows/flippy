@@ -44,7 +44,6 @@ class VideoBuilder:
 
         # Array that holds current blended image data
         master = np.zeros((self.out_height, self.out_width, 3), np.float32)
-        #master = np.zeros((self.out_height, self.out_width, 3), np.uint8)
         count = 1
 
         logging.info('Building fading timelapse of {} images in {}...'.format(
