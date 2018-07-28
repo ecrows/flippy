@@ -3,7 +3,9 @@ Python script for generating videos by overlaying images.
 
 ![Preview Example](examples/anime_face.gif)
 
-usage: lapse.py [-h] [-v] [-f FPS] [-o OUTPUT] [-c CODEC] path [path ...]
+```
+usage: lapse.py [-h] [-v] [-f FPS] [-o OUTPUT] [-c CODEC] [-t TYPE]
+                path [path ...]
 
 Build a fading timelapse of overlayed images.
 
@@ -17,13 +19,16 @@ optional arguments:
   -o OUTPUT, --output OUTPUT
                         output file
   -c CODEC, --codec CODEC
-                        fourcc codec
+                        fourcc codec (DIVX, XVID, MJPG, X264, WMV1, WMV2)
+  -t TYPE, --type TYPE  type of video (blend, flipbook, split)
+```
 
 Example:
-
-python3 lapse.py /some/path/faces\_64px -o ~/output.avi -f 60.0 -c XVID
+```
+python3 lapse.py /some/path/faces -o ~/output.avi -f 60.0 -c XVID -t blend
 
 INFO:root:Auto-detected image dimensions as 64x64...
-INFO:root:Building fading timelapse of 24247 images in /some/path/faces\_64px...
+INFO:root:Building fading timelapse of 24247 images in /some/path/faces...
 INFO:root:Output settings: 64x64 @ 60.0 FPS
-
+INFO:root:Successfully wrote /home/user/output.avi
+```
