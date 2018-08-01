@@ -27,6 +27,9 @@ optional arguments:
   -c CODEC, --codec CODEC
                         fourcc codec (DIVX, XVID, MJPG, X264, WMV1, WMV2)
   -t TYPE, --type TYPE  type of video (blend, flipbook, split)
+  -r REGEX, --regex REGEX
+                        file regex for matching images, passed to glob as
+                        [path]/[regex]. Defaults to all image formats
 ```
 
 Example:
