@@ -18,15 +18,18 @@ class VideoBuilder:
         self.fourcc = cv2.VideoWriter_fourcc(*args.codec[0]) # See OpenCV video docs for more
         self.imgs = []
 
-        for extension in self.img_extensions:
-            self.imgs.extend(glob.glob(self.image_path + "/*." + extension))
+        if len(args.regex) > 0:
+            self.imgs.extend(glob.glob(self.image_path + "/" + args.regex[0]))
+        else:
+            for extension in self.img_extensions:
+                self.imgs.extend(glob.glob(self.image_path + "/*." + extension))
 
         # Use first image file in path as template for image output
         try:
             sample = cv2.imread(self.imgs[0], cv2.IMREAD_COLOR)
         except IndexError:
             logging.error("No images found in path {}".format(self.image_path))
-            return
+            exit()
 
         self.out_height, self.out_width = sample.shape[:2]
 
@@ -147,6 +150,8 @@ def read_args():
                         help='fourcc codec (DIVX, XVID, MJPG, X264, WMV1, WMV2)', type=str, default=['DIVX'])
     parser.add_argument('-t', '--type', nargs=1,
                         help='type of video (blend, flipbook, split)', type=str, default=['blend'])
+    parser.add_argument('-r', '--regex', nargs=1,
+                        help='file regex for matching images, passed to glob as [path]/[regex]. Defaults to all image formats', type=str, default=[])
     args = parser.parse_args()
 
     if args.verbose:
