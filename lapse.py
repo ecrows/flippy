@@ -11,20 +11,19 @@ import re
 
 class VideoBuilder:
 
-    def __init__(self, image_path, input_files, fps, out_file, codec):
+    def __init__(self, input_files, fps, out_file, codec):
         self.fps = fps
         self.out_file = out_file
-        self.image_path = image_path
         self.imgs = input_files
 
         # See OpenCV video docs for more codecs
-        self.fourcc = cv2.VideoWriter_fourcc(*codec)  
+        self.fourcc = cv2.VideoWriter_fourcc(*codec)
 
         # Use first image file in path as template for image output
         try:
             sample = cv2.imread(self.imgs[0], cv2.IMREAD_COLOR)
         except IndexError:
-            logging.error("No images found in path {}".format(self.image_path))
+            logging.error("No input images provided")
             exit()
 
         self.out_height, self.out_width = sample.shape[:2]
@@ -51,8 +50,8 @@ class VideoBuilder:
         master = np.zeros((self.out_height, self.out_width, 3), np.float32)
         count = 1
 
-        logging.info('Building fading timelapse of {} images in {}...'.format(
-            len(self.imgs), self.image_path))
+        logging.info('Building fading timelapse of {} images...'.format(
+            len(self.imgs)))
 
         for filename in self.imgs:
             image = cv2.imread(filename, cv2.IMREAD_COLOR)
@@ -87,8 +86,8 @@ class VideoBuilder:
             (self.out_width,
              self.out_height))
 
-        logging.info('Building flipbook of {} images in {}...'.format(
-            len(self.imgs), self.image_path))
+        logging.info('Building flipbook of {} images...'.format(
+            len(self.imgs)))
 
         for filename in self.imgs:
             image = cv2.imread(filename, cv2.IMREAD_COLOR)
@@ -121,8 +120,8 @@ class VideoBuilder:
         master = np.zeros((self.out_height, self.out_width, 3), np.float32)
         count = 1
 
-        logging.info('Building split blend/flipbook of {} images in {}...'.format(
-            len(self.imgs), self.image_path))
+        logging.info('Building split blend/flipbook of {} images...'.format(
+            len(self.imgs)))
 
         for filename in self.imgs:
             image = cv2.imread(filename, cv2.IMREAD_COLOR)
@@ -178,7 +177,7 @@ def read_args():
         '-r',
         '--regex',
         nargs=1,
-        help='file regex for images in path, default matches common lowercase image extensions',
+        help='file match regex, default matches files with common lowercase image extensions',
         type=str,
         default=['.*\.jpg|.*\.jpeg|.*\.png|.*\.bmp|.*\.gif'])
     args = parser.parse_args()
@@ -194,18 +193,12 @@ def read_args():
 if __name__ == "__main__":
     args = read_args()
 
-    regex='.*\.jpg|.*\.jpeg|.*\.png|.*\.bmp|.*\.gif'
-
     images = []
     for image in os.listdir(args.path[0]):
-        if re.match('.*\.jpg|.*\.jpeg|.*\.png|.*\.bmp|.*\.gif', image):
+        if re.match(args.regex[0], image):
             images.append(os.path.abspath(args.path[0] + "/" + image))
 
-    builder = VideoBuilder(args.path[0],
-            images,
-            args.fps[0],
-            args.output[0],
-            args.codec[0])
+    builder = VideoBuilder(images, args.fps[0], args.output[0], args.codec[0])
 
     if args.type[0] == 'blend':
         builder.make_blend_video()
@@ -214,4 +207,5 @@ if __name__ == "__main__":
     elif args.type[0] == 'split':
         builder.make_split_video()
     else:
-        logging.error("Invalid video type, try 'blend' or 'flipbook'")
+        logging.error(
+            "Invalid video type, try 'blend', 'flipbook', or 'split'")

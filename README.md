@@ -10,7 +10,7 @@ Python script for generating videos by overlaying images.
 ## Usage
 
 ```
-usage: lapse.py [-h] [-v] [-f FPS] [-o OUTPUT] [-c CODEC] [-t TYPE]
+usage: lapse.py [-h] [-v] [-f FPS] [-o OUTPUT] [-c CODEC] [-t TYPE] [-r REGEX]
                 path [path ...]
 
 Build a fading timelapse of overlayed images.
@@ -28,8 +28,8 @@ optional arguments:
                         fourcc codec (DIVX, XVID, MJPG, X264, WMV1, WMV2)
   -t TYPE, --type TYPE  type of video (blend, flipbook, split)
   -r REGEX, --regex REGEX
-                        file regex for matching images, passed to glob as
-                        [path]/[regex]. Defaults to all image formats
+                        file regex for images in path, default matches common
+                        lowercase image extensions
 ```
 
 Example:
