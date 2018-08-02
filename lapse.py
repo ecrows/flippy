@@ -2,27 +2,23 @@
 
 import cv2
 import json
-import glob
 import logging
 import numpy as np
 import argparse
 import os
+import re
+
 
 class VideoBuilder:
-    img_extensions = ['jpg', 'jpeg', 'png', 'bmp', 'gif']
 
-    def __init__(self, args):
-        self.fps = args.fps[0]
-        self.out_file = args.output[0]
-        self.image_path = args.path[0]
-        self.fourcc = cv2.VideoWriter_fourcc(*args.codec[0]) # See OpenCV video docs for more
-        self.imgs = []
+    def __init__(self, image_path, input_files, fps, out_file, codec):
+        self.fps = fps
+        self.out_file = out_file
+        self.image_path = image_path
+        self.imgs = input_files
 
-        if len(args.regex) > 0:
-            self.imgs.extend(glob.glob(self.image_path + "/" + args.regex[0]))
-        else:
-            for extension in self.img_extensions:
-                self.imgs.extend(glob.glob(self.image_path + "/*." + extension))
+        # See OpenCV video docs for more codecs
+        self.fourcc = cv2.VideoWriter_fourcc(*codec)  
 
         # Use first image file in path as template for image output
         try:
@@ -42,8 +38,14 @@ class VideoBuilder:
     """
     Generate blend video
     """
+
     def make_blend_video(self):
-        video = cv2.VideoWriter(self.out_file, self.fourcc, self.fps, (self.out_width, self.out_height))
+        video = cv2.VideoWriter(
+            self.out_file,
+            self.fourcc,
+            self.fps,
+            (self.out_width,
+             self.out_height))
 
         # Array that holds current blended image data
         master = np.zeros((self.out_height, self.out_width, 3), np.float32)
@@ -64,7 +66,7 @@ class VideoBuilder:
             # Use float to allow greater blend precision
             fl_image = np.float32(image)
             master = cv2.addWeighted(master, float(
-                (count-1)/count), fl_image, float(1.0/count), 0)
+                (count - 1) / count), fl_image, float(1.0 / count), 0)
             video.write(np.uint8(master))
 
             count += 1
@@ -76,8 +78,14 @@ class VideoBuilder:
     """
     Generate flipbook style video
     """
+
     def make_flipbook(self):
-        video = cv2.VideoWriter(self.out_file, self.fourcc, self.fps, (self.out_width, self.out_height))
+        video = cv2.VideoWriter(
+            self.out_file,
+            self.fourcc,
+            self.fps,
+            (self.out_width,
+             self.out_height))
 
         logging.info('Building flipbook of {} images in {}...'.format(
             len(self.imgs), self.image_path))
@@ -100,8 +108,14 @@ class VideoBuilder:
     """
     Generate split style video
     """
+
     def make_split_video(self):
-        video = cv2.VideoWriter(self.out_file, self.fourcc, self.fps, (self.out_width * 2, self.out_height))
+        video = cv2.VideoWriter(
+            self.out_file,
+            self.fourcc,
+            self.fps,
+            (self.out_width * 2,
+             self.out_height))
 
         # Array that holds current blended image data
         master = np.zeros((self.out_height, self.out_width, 3), np.float32)
@@ -122,7 +136,7 @@ class VideoBuilder:
             # Use float to allow greater blend precision
             fl_image = np.float32(image)
             master = cv2.addWeighted(master, float(
-                (count-1)/count), fl_image, float(1.0/count), 0)
+                (count - 1) / count), fl_image, float(1.0 / count), 0)
             combo = np.concatenate((image, np.uint8(master)), axis=1)
 
             video.write(combo)
@@ -146,12 +160,27 @@ def read_args():
                         help='frames per second', type=float, default=[20.0])
     parser.add_argument('-o', '--output', nargs=1,
                         help='output file', type=str, default=['video.avi'])
-    parser.add_argument('-c', '--codec', nargs=1,
-                        help='fourcc codec (DIVX, XVID, MJPG, X264, WMV1, WMV2)', type=str, default=['DIVX'])
-    parser.add_argument('-t', '--type', nargs=1,
-                        help='type of video (blend, flipbook, split)', type=str, default=['blend'])
-    parser.add_argument('-r', '--regex', nargs=1,
-                        help='file regex for matching images, passed to glob as [path]/[regex]. Defaults to all image formats', type=str, default=[])
+    parser.add_argument(
+        '-c',
+        '--codec',
+        nargs=1,
+        help='fourcc codec (DIVX, XVID, MJPG, X264, WMV1, WMV2)',
+        type=str,
+        default=['DIVX'])
+    parser.add_argument(
+        '-t',
+        '--type',
+        nargs=1,
+        help='type of video (blend, flipbook, split)',
+        type=str,
+        default=['blend'])
+    parser.add_argument(
+        '-r',
+        '--regex',
+        nargs=1,
+        help='file regex for images in path, default matches common lowercase image extensions',
+        type=str,
+        default=['.*\.jpg|.*\.jpeg|.*\.png|.*\.bmp|.*\.gif'])
     args = parser.parse_args()
 
     if args.verbose:
@@ -161,9 +190,22 @@ def read_args():
 
     return args
 
+
 if __name__ == "__main__":
     args = read_args()
-    builder = VideoBuilder(args)
+
+    regex='.*\.jpg|.*\.jpeg|.*\.png|.*\.bmp|.*\.gif'
+
+    images = []
+    for image in os.listdir(args.path[0]):
+        if re.match('.*\.jpg|.*\.jpeg|.*\.png|.*\.bmp|.*\.gif', image):
+            images.append(os.path.abspath(args.path[0] + "/" + image))
+
+    builder = VideoBuilder(args.path[0],
+            images,
+            args.fps[0],
+            args.output[0],
+            args.codec[0])
 
     if args.type[0] == 'blend':
         builder.make_blend_video()
@@ -173,4 +215,3 @@ if __name__ == "__main__":
         builder.make_split_video()
     else:
         logging.error("Invalid video type, try 'blend' or 'flipbook'")
-
