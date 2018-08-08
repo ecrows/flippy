@@ -1,5 +1,5 @@
 # flippy
-Python script for generating videos by overlaying images.
+Python script for generating videos by rapidly flipping through or overlaying images.
 
 ![Preview Example](examples/anime_face.gif)
 
