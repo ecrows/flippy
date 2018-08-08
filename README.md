@@ -1,7 +1,7 @@
 # flippy
 Python script for generating videos by rapidly flipping through or overlaying images.
 
-![Preview Example](examples/anime_face.gif)
+![Preview Example](https://i.imgur.com/LLKZpr5.gif)
 
 ## Requirements
 * [OpenCV](https://opencv.org/)
