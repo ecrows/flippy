@@ -3,23 +3,22 @@ Python script for generating videos by rapidly flipping through or overlaying im
 
 ![Preview Example](https://i.imgur.com/LLKZpr5.gif)
 
-## Requirements
-* [OpenCV](https://opencv.org/)
-* numpy
+## Installation
+`pip install flippy`
+
+This will automatically download and install `flippy`, `opencv-python`, and `numpy`.
+
 
 ## Usage
 
-Simple example:
 ```
 flippy /some/image/path
-
-INFO:root:Auto-detected image dimensions as 64x64...
-INFO:root:Building fading timelapse of 24247 images in /some/path/faces...
-INFO:root:Output settings: 64x64 @ 20.0 FPS
-INFO:root:Successfully wrote video.avi
 ```
 
-Slightly more complicated example:
+This will build a video out of the images in the directory `/some/image/path`, using the auto-detected resolution at the default 20 FPS.
+
+Flippy is heavily configurable, and accepts a number of command line arguments.
+
 ```
 flippy /some/image/path -o ~/output.avi -f 60.0 -c XVID -t blend
 
@@ -29,9 +28,9 @@ INFO:root:Output settings: 64x64 @ 60.0 FPS
 INFO:root:Successfully wrote /home/user/output.avi
 ```
 
-Console help:
+For the full list of availble arguments, type `flippy --help`.
 ```
-usage: lapse.py [-h] [-v] [-f FPS] [-o OUTPUT] [-c CODEC] [-t TYPE] [-r REGEX]
+usage: flippy [-h] [-v] [-f FPS] [-o OUTPUT] [-c CODEC] [-t TYPE] [-r REGEX]
                 path [path ...]
 
 Build a fading timelapse of overlayed images.
@@ -52,3 +51,7 @@ optional arguments:
                         file regex for images in path, default matches common
                         lowercase image extensions
 ```
+
+## Requirements
+* [OpenCV](https://opencv.org/)
+* [numpy](http://www.numpy.org/)
